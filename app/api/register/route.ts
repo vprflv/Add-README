@@ -1,14 +1,6 @@
-
 import { NextResponse } from 'next/server';
-
-
-type User = {
-    id: number;
-    email: string;
-    password: string;
-    name?: string;
-    createdAt: string;
-};
+import { supabase } from '@/supabase';
+import {User} from "@/shared/types";
 
 export let users: User[] = [];
 
@@ -16,6 +8,9 @@ export async function POST(request: Request) {
     try {
         const body = await request.json();
         const { email, password, name } = body;
+
+
+
 
         if (!email || !password) {
             return NextResponse.json(
@@ -40,7 +35,17 @@ export async function POST(request: Request) {
             createdAt: new Date().toISOString(),
         };
 
-        users.push(newUser);
+        if(newUser){
+            const { data, error } = await supabase.auth.signUp({
+                email,
+                password,
+                options: { data: { name } }
+            });
+
+            users.push(newUser);
+        }
+
+
 
         // Возвращаем данные без пароля
         const { password: _, ...safeUser } = newUser;
@@ -56,3 +61,24 @@ export async function POST(request: Request) {
         );
     }
 }
+
+// import { supabase } from '@/supabase';
+// import { NextResponse } from 'next/server';
+//
+// export async function POST(request: Request) {
+//     const { email, password, name } = await request.json();
+//
+//     const { data, error } = await supabase.auth.signUp({
+//         email,
+//         password,
+//         options: { data: { name } }
+//     });
+//
+//     if (error) {
+//         return NextResponse.json({ error: error.message }, { status: 400 });
+//     }
+//
+//     return NextResponse.json({ user: data.user }, { status: 201 });
+// }
+
+

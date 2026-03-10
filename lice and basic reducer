@@ -1,0 +1,370 @@
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'pnpm-lock.yaml', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/app/api/register/route.ts b/app/api/register/route.ts[m
+[1mindex e294108..c10e1eb 100644[m
+[1m--- a/app/api/register/route.ts[m
+[1m+++ b/app/api/register/route.ts[m
+[36m@@ -1,58 +1,118 @@[m
+[31m-[m
+[32m+[m[32mimport { supabase } from '@/supabase';[m
+ import { NextResponse } from 'next/server';[m
+ [m
+[32m+[m[32mexport async function POST(request: Request) {[m
+[32m+[m[32m    const { email, password, name } = await request.json();[m
+ [m
+[31m-type User = {[m
+[31m-    id: number;[m
+[31m-    email: string;[m
+[31m-    password: string;[m
+[31m-    name?: string;[m
+[31m-    createdAt: string;[m
+[31m-};[m
+[31m-[m
+[31m-export let users: User[] = [];[m
+[32m+[m[32m    const { data, error } = await supabase.auth.signUp({[m
+[32m+[m[32m        email,[m
+[32m+[m[32m        password,[m
+[32m+[m[32m        options: { data: { name } }[m
+[32m+[m[32m    });[m
+ [m
+[31m-export async function POST(request: Request) {[m
+[31m-    try {[m
+[31m-        const body = await request.json();[m
+[31m-        const { email, password, name } = body;[m
+[31m-[m
+[31m-        if (!email || !password) {[m
+[31m-            return NextResponse.json([m
+[31m-                { error: 'Email и пароль обязательны' },[m
+[31m-                { status: 400 }[m
+[31m-            );[m
+[31m-        }[m
+[31m-[m
+[31m-        // Проверка, существует ли уже такой email[m
+[31m-        if (users.some(u => u.email === email)) {[m
+[31m-            return NextResponse.json([m
+[31m-                { error: 'Пользователь с таким email уже существует' },[m
+[31m-                { status: 409 }[m
+[31m-            );[m
+[31m-        }[m
+[31m-[m
+[31m-        const newUser: User = {[m
+[31m-            id: users.length ? Math.max(...users.map(u => u.id)) + 1 : 1,[m
+[31m-            email,[m
+[31m-            password,           // ← в реальности — хешировать (bcrypt / argon2)[m
+[31m-            name: name || null,[m
+[31m-            createdAt: new Date().toISOString(),[m
+[31m-        };[m
+[31m-[m
+[31m-        users.push(newUser);[m
+[31m-[m
+[31m-        // Возвращаем данные без пароля[m
+[31m-        const { password: _, ...safeUser } = newUser;[m
+[31m-[m
+[31m-[m
+[31m-[m
+[31m-        return NextResponse.json(safeUser, { status: 201 });[m
+[31m-    } catch (err) {[m
+[31m-        console.error(err);[m
+[31m-        return NextResponse.json([m
+[31m-            { error: 'Ошибка сервера' },[m
+[31m-            { status: 500 }[m
+[31m-        );[m
+[32m+[m[32m    if (error) {[m
+[32m+[m[32m        return NextResponse.json({ error: error.message }, { status: 400 });[m
+     }[m
+[31m-}[m
+\ No newline at end of file[m
+[32m+[m
+[32m+[m[32m    return NextResponse.json({ user: data.user }, { status: 201 });[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m[32m//[m
+[32m+[m[32m// import { NextResponse } from 'next/server';[m
+[32m+[m[32m//[m
+[32m+[m[32m//[m
+[32m+[m[32m// type User = {[m
+[32m+[m[32m//     id: number;[m
+[32m+[m[32m//     email: string;[m
+[32m+[m[32m//     password: string;[m
+[32m+[m[32m//     name?: string;[m
+[32m+[m[32m//     createdAt: string;[m
+[32m+[m[32m// };[m
+[32m+[m[32m//[m
+[32m+[m[32m// export let users: User[] = [];[m
+[32m+[m[32m//[m
+[32m+[m[32m// export async function POST(request: Request) {[m
+[32m+[m[32m//     try {[m
+[32m+[m[32m//         const body = await request.json();[m
+[32m+[m[32m//         const { email, password, name } = body;[m
+[32m+[m[32m//[m
+[32m+[m[32m//         if (!email || !password) {[m
+[32m+[m[32m//             return NextResponse.json([m
+[32m+[m[32m//                 { error: 'Email и пароль обязательны' },[m
+[32m+[m[32m//                 { status: 400 }[m
+[32m+[m[32m//             );[m
+[32m+[m[32m//         }[m
+[32m+[m[32m//[m
+[32m+[m[32m//         // Проверка, существует ли уже такой email[m
+[32m+[m[32m//         if (users.some(u => u.email === email)) {[m
+[32m+[m[32m//             return NextResponse.json([m
+[32m+[m[32m//                 { error: 'Пользователь с таким email уже существует' },[m
+[32m+[m[32m//                 { status: 409 }[m
+[32m+[m[32m//             );[m
+[32m+[m[32m//         }[m
+[32m+[m[32m//[m
+[32m+[m[32m//         const newUser: User = {[m
+[32m+[m[32m//             id: users.length ? Math.max(...users.map(u => u.id)) + 1 : 1,[m
+[32m+[m[32m//             email,[m
+[32m+[m[32m//             password,           // ← в реальности — хешировать (bcrypt / argon2)[m
+[32m+[m[32m//             name: name || null,[m
+[32m+[m[32m//             createdAt: new Date().toISOString(),[m
+[32m+[m[32m//         };[m
+[32m+[m[32m//[m
+[32m+[m[32m//         users.push(newUser);[m
+[32m+[m[32m//[m
+[32m+[m[32m//         // Возвращаем данные без пароля[m
+[32m+[m[32m//         const { password: _, ...safeUser } = newUser;[m
+[32m+[m[32m//[m
+[32m+[m[32m//[m
+[32m+[m[32m//[m
+[32m+[m[32m//         return NextResponse.json(safeUser, { status: 201 });[m
+[32m+[m[32m//     } catch (err) {[m
+[32m+[m[32m//         console.error(err);[m
+[32m+[m[32m//         return NextResponse.json([m
+[32m+[m[32m//             { error: 'Ошибка сервера' },[m
+[32m+[m[32m//             { status: 500 }[m
+[32m+[m[32m//         );[m
+[32m+[m[32m//     }[m
+[32m+[m[32m// }[m
+\ No newline at end of file[m
+[1mdiff --git a/package.json b/package.json[m
+[1mindex 520ba57..7486afb 100644[m
+[1m--- a/package.json[m
+[1m+++ b/package.json[m
+[36m@@ -9,6 +9,7 @@[m
+     "lint": "eslint"[m
+   },[m
+   "dependencies": {[m
+[32m+[m[32m    "@supabase/supabase-js": "^2.99.0",[m
+     "@tanstack/react-query": "^5.90.21",[m
+     "next": "16.1.6",[m
+     "react": "19.2.3",[m
+[1mdiff --git a/pnpm-lock.yaml b/pnpm-lock.yaml[m
+[1mindex df0a55c..4676101 100644[m
+[1m--- a/pnpm-lock.yaml[m
+[1m+++ b/pnpm-lock.yaml[m
+[36m@@ -8,6 +8,9 @@[m [mimporters:[m
+ [m
+   .:[m
+     dependencies:[m
+[32m+[m[32m      '@supabase/supabase-js':[m
+[32m+[m[32m        specifier: ^2.99.0[m
+[32m+[m[32m        version: 2.99.0[m
+       '@tanstack/react-query':[m
+         specifier: ^5.90.21[m
+         version: 5.90.21(react@19.2.3)[m
+[36m@@ -434,6 +437,30 @@[m [mpackages:[m
+   '@rtsao/scc@1.1.0':[m
+     resolution: {integrity: sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g==}[m
+ [m
+[32m+[m[32m  '@supabase/auth-js@2.99.0':[m
+[32m+[m[32m    resolution: {integrity: sha512-tHiIST/OEoLmWBE+3X69xRY5srJM/lL86KltmMlIfDo9ePJLo14vQQV9T4NF+P+MoGhCwQL1GTmk51zuAFMXKw==}[m
+[32m+[m[32m    engines: {node: '>=20.0.0'}[m
+[32m+[m
+[32m+[m[32m  '@supabase/functions-js@2.99.0':[m
+[32m+[m[32m    resolution: {integrity: sha512-zA9oad6EqGwMLLu2LfP1bXbqKcJGiotAdbdTfZG7YS7619YZQAEgejj9mp+E5vglKE1yMWbKK+S1J3PbuUtgLg==}[m
+[32m+[m[32m    engines: {node: '>=20.0.0'}[m
+[32m+[m
+[32m+[m[32m  '@supabase/postgrest-js@2.99.0':[m
+[32m+[m[32m    resolution: {integrity: sha512-8qfOMi2pu9y0IQhUAeFqjrvR49G4ELGevXCWV9qAHXFQ/h2FFh0I8PYjFQj4rHcHSq6hrpozDnS1vbQU8NAQ/A==}[m
+[32m+[m[32m    engines: {node: '>=20.0.0'}[m
+[32m+[m
+[32m+[m[32m  '@supabase/realtime-js@2.99.0':[m
+[32m+[m[32m    resolution: {integrity: sha512-7nFTZhNeANR7FvEY6PfWLCfE8dHqcaJd9SuR7IPEZvBPG9K4uEHMivpjZx4NWRSU7Eji7ZbKy2LG+cJ48DhwHg==}[m
+[32m+[m[32m    engines: {node: '>=20.0.0'}[m
+[32m+[m
+[32m+[m[32m  '@supabase/storage-js@2.99.0':[m
+[32m+[m[32m    resolution: {integrity: sha512-mAEEbfsght5EEALejYrwAP9k8sFBGjfMZT8n4SyMXk2iYuWVeRMs1kA/uKg0uDMctWdZ0bL+L4jZzksUJpCjMA==}[m
+[32m+[m[32m    engines: {node: '>=20.0.0'}[m
+[32m+[m
+[32m+[m[32m  '@supabase/supabase-js@2.99.0':[m
+[32m+[m[32m    resolution: {integrity: sha512-SP9Sn9tsHDB7N4u2gT13rdeZJewE4xibAxasG7vOz+fYi92+XkMMbWNx0uGK53zKTnAnvTs16isRooyBy4sn5w==}[m
+[32m+[m[32m    engines: {node: '>=20.0.0'}[m
+[32m+[m
+   '@swc/helpers@0.5.15':[m
+     resolution: {integrity: sha512-JQ5TuMi45Owi4/BIMAJBoSQoOJu12oOk/gADqlcUL9JEdHB8vyjUSsxqeNXnmXHjYKMi2WcYtezGEEhqUI/E2g==}[m
+ [m
+[36m@@ -561,6 +588,9 @@[m [mpackages:[m
+   '@types/node@20.19.37':[m
+     resolution: {integrity: sha512-8kzdPJ3FsNsVIurqBs7oodNnCEVbni9yUEkaHbgptDACOPW04jimGagZ51E6+lXUwJjgnBw+hyko/lkFWCldqw==}[m
+ [m
+[32m+[m[32m  '@types/phoenix@1.6.7':[m
+[32m+[m[32m    resolution: {integrity: sha512-oN9ive//QSBkf19rfDv45M7eZPi0eEXylht2OLEXicu5b4KoQ1OzXIw+xDSGWxSxe1JmepRR/ZH283vsu518/Q==}[m
+[32m+[m
+   '@types/react-dom@19.2.3':[m
+     resolution: {integrity: sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ==}[m
+     peerDependencies:[m
+[36m@@ -569,6 +599,9 @@[m [mpackages:[m
+   '@types/react@19.2.14':[m
+     resolution: {integrity: sha512-ilcTH/UniCkMdtexkoCN0bI7pMcJDvmQFPvuPvmEaYA/NSfFTAgdUSLAoVjaRJm7+6PvcM+q1zYOwS4wTYMF9w==}[m
+ [m
+[32m+[m[32m  '@types/ws@8.18.1':[m
+[32m+[m[32m    resolution: {integrity: sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg==}[m
+[32m+[m
+   '@typescript-eslint/eslint-plugin@8.56.1':[m
+     resolution: {integrity: sha512-Jz9ZztpB37dNC+HU2HI28Bs9QXpzCz+y/twHOwhyrIRdbuVDxSytJNDl6z/aAKlaRIwC7y8wJdkBv7FxYGgi0A==}[m
+     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}[m
+[36m@@ -1246,6 +1279,10 @@[m [mpackages:[m
+   hermes-parser@0.25.1:[m
+     resolution: {integrity: sha512-6pEjquH3rqaI6cYAXYPcz9MS4rY6R4ngRgrgfDshRptUZIc3lw0MCIJIGDj9++mfySOuPTHB4nrSW99BCvOPIA==}[m
+ [m
+[32m+[m[32m  iceberg-js@0.8.1:[m
+[32m+[m[32m    resolution: {integrity: sha512-1dhVQZXhcHje7798IVM+xoo/1ZdVfzOMIc8/rgVSijRK38EDqOJoGula9N/8ZI5RD8QTxNQtK/Gozpr+qUqRRA==}[m
+[32m+[m[32m    engines: {node: '>=20.0.0'}[m
+[32m+[m
+   ignore@5.3.2:[m
+     resolution: {integrity: sha512-hsBTNUqQTDwkWtcdYI2i06Y/nUBEsNEDJKjWdigLvegy8kDuJAS8uRlpkkcQpyEXL0Z/pjDy5HBmMjRCJ2gq+g==}[m
+     engines: {node: '>= 4'}[m
+[36m@@ -1962,6 +1999,18 @@[m [mpackages:[m
+     resolution: {integrity: sha512-BN22B5eaMMI9UMtjrGd5g5eCYPpCPDUy0FJXbYsaT5zYxjFOckS53SQDE3pWkVoWpHXVb3BrYcEN4Twa55B5cA==}[m
+     engines: {node: '>=0.10.0'}[m
+ [m
+[32m+[m[32m  ws@8.19.0:[m
+[32m+[m[32m    resolution: {integrity: sha512-blAT2mjOEIi0ZzruJfIhb3nps74PRWTCz1IjglWEEpQl5XS/UNama6u2/rjFkDDouqr4L67ry+1aGIALViWjDg==}[m
+[32m+[m[32m    engines: {node: '>=10.0.0'}[m
+[32m+[m[32m    peerDependencies:[m
+[32m+[m[32m      bufferutil: ^4.0.1[m
+[32m+[m[32m      utf-8-validate: '>=5.0.2'[m
+[32m+[m[32m    peerDependenciesMeta:[m
+[32m+[m[32m      bufferutil:[m
+[32m+[m[32m        optional: true[m
+[32m+[m[32m      utf-8-validate:[m
+[32m+[m[32m        optional: true[m
+[32m+[m
+   yallist@3.1.1:[m
+     resolution: {integrity: sha512-a4UGQaWPH59mOXUYnAG2ewncQS4i4F43Tv3JoAM+s2VDAmS9NsK8GpDMLrCHPksFT7h3K6TOoUNn2pb7RoXx4g==}[m
+ [m
+[36m@@ -2324,6 +2373,44 @@[m [msnapshots:[m
+ [m
+   '@rtsao/scc@1.1.0': {}[m
+ [m
+[32m+[m[32m  '@supabase/auth-js@2.99.0':[m
+[32m+[m[32m    dependencies:[m
+[32m+[m[32m      tslib: 2.8.1[m
+[32m+[m
+[32m+[m[32m  '@supabase/functions-js@2.99.0':[m
+[32m+[m[32m    dependencies:[m
+[32m+[m[32m      tslib: 2.8.1[m
+[32m+[m
+[32m+[m[32m  '@supabase/postgrest-js@2.99.0':[m
+[32m+[m[32m    dependencies:[m
+[32m+[m[32m      tslib: 2.8.1[m
+[32m+[m
+[32m+[m[32m  '@supabase/realtime-js@2.99.0':[m
+[32m+[m[32m    dependencies:[m
+[32m+[m[32m      '@types/phoenix': 1.6.7[m
+[32m+[m[32m      '@types/ws': 8.18.1[m
+[32m+[m[32m      tslib: 2.8.1[m
+[32m+[m[32m      ws: 8.19.0[m
+[32m+[m[32m    transitivePeerDependencies:[m
+[32m+[m[32m      - bufferutil[m
+[32m+[m[32m      - utf-8-validate[m
+[32m+[m
+[32m+[m[32m  '@supabase/storage-js@2.99.0':[m
+[32m+[m[32m    dependencies:[m
+[32m+[m[32m      iceberg-js: 0.8.1[m
+[32m+[m[32m      tslib: 2.8.1[m
+[32m+[m
+[32m+[m[32m  '@supabase/supabase-js@2.99.0':[m
+[32m+[m[32m    dependencies:[m
+[32m+[m[32m      '@supabase/auth-js': 2.99.0[m
+[32m+[m[32m      '@supabase/functions-js': 2.99.0[m
+[32m+[m[32m      '@supabase/postgrest-js': 2.99.0[m
+[32m+[m[32m      '@supabase/realtime-js': 2.99.0[m
+[32m+[m[32m      '@supabase/storage-js': 2.99.0[m
+[32m+[m[32m    transitivePeerDependencies:[m
+[32m+[m[32m      - bufferutil[m
+[32m+[m[32m      - utf-8-validate[m
+[32m+[m
+   '@swc/helpers@0.5.15':[m
+     dependencies:[m
+       tslib: 2.8.1[m
+[36m@@ -2428,6 +2515,8 @@[m [msnapshots:[m
+     dependencies:[m
+       undici-types: 6.21.0[m
+ [m
+[32m+[m[32m  '@types/phoenix@1.6.7': {}[m
+[32m+[m
+   '@types/react-dom@19.2.3(@types/react@19.2.14)':[m
+     dependencies:[m
+       '@types/react': 19.2.14[m
+[36m@@ -2436,6 +2525,10 @@[m [msnapshots:[m
+     dependencies:[m
+       csstype: 3.2.3[m
+ [m
+[32m+[m[32m  '@types/ws@8.18.1':[m
+[32m+[m[32m    dependencies:[m
+[32m+[m[32m      '@types/node': 20.19.37[m
+[32m+[m
+   '@typescript-eslint/eslint-plugin@8.56.1(@typescript-eslint/parser@8.56.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)':[m
+     dependencies:[m
+       '@eslint-community/regexpp': 4.12.2[m
+[36m@@ -3272,6 +3365,8 @@[m [msnapshots:[m
+     dependencies:[m
+       hermes-estree: 0.25.1[m
+ [m
+[32m+[m[32m  iceberg-js@0.8.1: {}[m
+[32m+[m
+   ignore@5.3.2: {}[m
+ [m
+   ignore@7.0.5: {}[m
+[36m@@ -4101,6 +4196,8 @@[m [msnapshots:[m
+ [m
+   word-wrap@1.2.5: {}[m
+ [m
+[32m+[m[32m  ws@8.19.0: {}[m
+[32m+[m
+   yallist@3.1.1: {}[m
+ [m
+   yocto-queue@0.1.0: {}[m

@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import {SafeUser} from "@/shared/types";
-import {users} from "@/app/api/register/route";
 
-// export let dataUsers: SafeUser[] = []; // ← замени на реальный источник
+
+ let dataUsers: SafeUser[] = []; // ← замени на реальный источник
 
 export async function GET() {
-    const safeUsers = users.map(u => ({
+    const safeUsers = dataUsers.map(u => ({
         id: u.id,
         email: u.email,
         name: u.name,
