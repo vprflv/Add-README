@@ -7,8 +7,8 @@ export type User = {
 };
 
 export type SafeUser = {
-    id: number;
+    id: string;
     email: string;
     name?: string | null;
-    createdAt: string;
+    createdAt: string | null;
 };

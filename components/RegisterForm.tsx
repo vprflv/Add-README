@@ -25,7 +25,7 @@ export default function RegisterForm() {
                 { email, password, name },
                 {
                     onSuccess: () => {
-                        router.push("/");
+                        router.push("/users");
                     },
                 }
             );
