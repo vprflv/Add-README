@@ -3,7 +3,7 @@ export type User = {
     email: string;
     password: string;
     name?: string | null;
-    createdAt: string;
+    createdAt: string | null;
 };
 
 export type SafeUser = {

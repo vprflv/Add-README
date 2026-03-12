@@ -66,7 +66,7 @@ export function useRegister() {
 
         onError: (err, newUserData, context) => {
             if (context?.previousUsers) {
-                queryClient.setQueryData(["users"], context.previousUsers);
+                queryClient.setQueryData(ListKeysQueries.usersKeyAll , context.previousUsers);
             }
         },
 
@@ -87,7 +87,7 @@ export function useRegister() {
 
         onSuccess: (newUser) => {
             // Например:
-            // queryClient.setQueryData(["currentUser"], newUser);
+            queryClient.setQueryData(["currentUser"], newUser);
             router.push("/users");
         },
     });
