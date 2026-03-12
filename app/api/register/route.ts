@@ -1,84 +1,65 @@
-import { NextResponse } from 'next/server';
-import { supabase } from '@/supabase';
-import {User} from "@/shared/types";
-
-export let users: User[] = [];
+import {createClient} from "@supabase/supabase-js";
+import {NextResponse} from "next/server";
+import {SafeUser} from "@/shared/types";
+import {supabase} from "@/supabase";
 
 export async function POST(request: Request) {
+
     try {
         const body = await request.json();
-        const { email, password, name } = body;
+        const {email, password, name} = body;
 
+        console.log('Получены данные регистрации:', {email, name}); // ← для проверки
 
+        // const supabase = createClient( // ← твой клиент (или supabase из импорта)
+        //     process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        //     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        // );
 
-
-        if (!email || !password) {
-            return NextResponse.json(
-                { error: 'Email и пароль обязательны' },
-                { status: 400 }
-            );
-        }
-
-        // Проверка, существует ли уже такой email
-        if (users.some(u => u.email === email)) {
-            return NextResponse.json(
-                { error: 'Пользователь с таким email уже существует' },
-                { status: 409 }
-            );
-        }
-
-        const newUser: User = {
-            id: users.length ? Math.max(...users.map(u => u.id)) + 1 : 1,
+        const {data, error} = await supabase.auth.signUp({
             email,
-            password,           // ← в реальности — хешировать (bcrypt / argon2)
-            name: name || null,
-            createdAt: new Date().toISOString(),
+            password,
+            options: {data: {name}}
+        });
+
+        console.log('Результат signUp:', {
+            user: data?.user ? {id: data.user.id, email: data.user.email} : null,
+            session: data?.session,
+            error: error ? {message: error.message, code: error.code, details: error.details} : null
+        });  // ← самое важное!
+
+        if (error) {
+            console.error('Ошибка signUp:', error);
+            let message = error.message;
+            let status = 400;
+
+            if (error.message.includes('duplicate key') || error.code === '23505') {
+                message = 'Пользователь с таким email уже существует';
+                status = 409;
+            } else if (error.message.toLowerCase().includes('password')) {
+                message = 'Пароль слишком слабый';
+            }
+
+            return NextResponse.json({error: message}, {status});
+
+        }
+
+        if (!data.user) {
+            console.error('signUp вернул success, но user = null');
+            return NextResponse.json({error: 'Пользователь не создан (нет data.user)'}, {status: 500});
+        }
+
+        const safeUser: SafeUser = {
+            id: data.user.id,
+            email: data.user.email!,
+            name: (data.user.user_metadata?.name as string | null) ?? null,
+            createdAt: data.user.created_at ?? new Date().toISOString(),
         };
 
-        if(newUser){
-            const { data, error } = await supabase.auth.signUp({
-                email,
-                password,
-                options: { data: { name } }
-            });
+        return NextResponse.json<SafeUser>(safeUser, {status: 201});
 
-            users.push(newUser);
-        }
-
-
-
-        // Возвращаем данные без пароля
-        const { password: _, ...safeUser } = newUser;
-
-
-
-        return NextResponse.json(safeUser, { status: 201 });
     } catch (err) {
-        console.error(err);
-        return NextResponse.json(
-            { error: 'Ошибка сервера' },
-            { status: 500 }
-        );
+        console.error('Неожиданная ошибка в register:', err);
+        return NextResponse.json({error: 'Ошибка сервера'}, {status: 500});
     }
 }
-
-// import { supabase } from '@/supabase';
-// import { NextResponse } from 'next/server';
-//
-// export async function POST(request: Request) {
-//     const { email, password, name } = await request.json();
-//
-//     const { data, error } = await supabase.auth.signUp({
-//         email,
-//         password,
-//         options: { data: { name } }
-//     });
-//
-//     if (error) {
-//         return NextResponse.json({ error: error.message }, { status: 400 });
-//     }
-//
-//     return NextResponse.json({ user: data.user }, { status: 201 });
-// }
-
-

@@ -72,11 +72,11 @@ export function useRegister() {
 
         onSettled: (newUserFromServer, error, variables, context) => {
             // Лучше всего — инвалидировать и перезагрузить список
-            queryClient.invalidateQueries({ queryKey: ["users"] });
+            queryClient.invalidateQueries({ queryKey: ListKeysQueries.usersKeyAll });
 
             // Альтернатива: если сервер вернул пользователя с настоящим id → обновляем точечно
             if (newUserFromServer && !error) {
-                queryClient.setQueryData<User[]>(["users"], (old = []) =>
+                queryClient.setQueryData<User[]>(ListKeysQueries.usersKeyAll, (old = []) =>
                     old.map((u) =>
                         // Заменяем временный id на настоящий (если сравниваете по email)
                         u.email === newUserFromServer.email ? newUserFromServer : u
@@ -87,8 +87,8 @@ export function useRegister() {
 
         onSuccess: (newUser) => {
             // Например:
-            queryClient.setQueryData(["currentUser"], newUser);
-            router.push("/");
+            // queryClient.setQueryData(["currentUser"], newUser);
+            router.push("/users");
         },
     });
 
