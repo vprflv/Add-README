@@ -29,7 +29,7 @@ export async function GET(request: Request) {
         .order('created_at', { ascending: false });
 
     if (error) {
-        console.error('Ошибка при получении профилей:', error);
+
         return NextResponse.json({ error: 'Не удалось загрузить пользователей' }, { status: 500 });
     }
 
