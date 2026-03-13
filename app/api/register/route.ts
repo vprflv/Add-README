@@ -50,23 +50,39 @@ export async function POST(request: Request) {
                 { status: 500 }
             );
         }
-
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
         // Важно: после signUp сессия может быть создана (если подтверждение email отключено)
-        if (data.session) {
+        if (session) {
             // Сохраняем куки автоматически через @supabase/ssr
             // (это уже сделано внутри createServerClient → setAll)
         }
 
-        const safeUser: SafeUser = {
+        let safeUser: SafeUser = {
             id: data.user.id,
             email: data.user.email!,
             name: (data.user.user_metadata?.name as string | null) ?? null,
             createdAt: data.user.created_at ?? new Date().toISOString(),
         };
 
+        if (session) {
+            return NextResponse.json<SafeUser & { isAuthenticated: true }>(
+                { ...safeUser, isAuthenticated: true },
+                { status: 201 }
+            );
+        }
 
-        return NextResponse.json<SafeUser>(safeUser, { status: 201 });
+
+
+
+        return NextResponse.json<SafeUser & { isAuthenticated: false; message: string }>(
+            {
+                ...safeUser,
+                isAuthenticated: false,
+                message: "Регистрация успешна. Проверьте почту и подтвердите email.",
+            },
+            { status: 202 } // 202 Accepted — регистрация прошла, но нужно подтверждение
+        );
 
 
 

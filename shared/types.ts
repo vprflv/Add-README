@@ -11,4 +11,5 @@ export type SafeUser = {
     email: string;
     name?: string | null;
     createdAt: string | null;
+
 };
