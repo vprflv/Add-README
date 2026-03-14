@@ -2,7 +2,6 @@
 
 
 import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
 import {useRouter} from "next/navigation";
 import { useForm } from '@tanstack/react-form';
 import {useMutation} from "@tanstack/react-query";
@@ -76,12 +75,12 @@ export function useLogin() {
 
     const mutation= useMutation({
         mutationFn: loginUser,
-        onSuccess: (response) => {
-            if ('isAuthenticated' in response && response.isAuthenticated) {
-
-                router.push('/'); // или куда вам нужно после логина
-            }
-        },
+        // onSuccess: (response) => {
+        //     if ('isAuthenticated' in response && response.isAuthenticated) {
+        //
+        //         router.push('/'); // или куда вам нужно после логина
+        //     }
+        // },
 
     });
 

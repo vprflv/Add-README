@@ -25,7 +25,42 @@ export async function createSupabaseServerClient() {
                         // user sessions.
                     }
                 },
+
+
+
+
             },
         }
     );
 }
+
+
+export async function getCurrentUser() {
+    const supabase = await createSupabaseServerClient();
+
+    // Самый надёжный и рекомендуемый способ на сервере
+    const { data: { user }, error } = await supabase.auth.getUser();
+
+    if (error) {
+        console.error('Ошибка при получении пользователя:', error);
+        return null;
+    }
+
+    if (!user) {
+        return null;
+    }
+
+    return {
+        id: user.id,
+        email: user.email ?? '',           // email всегда должен быть, но на всякий случай
+        name:
+            (user.user_metadata?.name as string | null) ??
+            (user.user_metadata?.full_name as string | null) ??
+            user.email?.split('@')[0] ??
+            null,
+        createdAt: user.created_at ?? new Date().toISOString(),
+        // Можно добавить другие поля, если нужно:
+        // avatar_url: user.user_metadata?.avatar_url as string | null,
+    };
+}
+
