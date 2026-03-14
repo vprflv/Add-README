@@ -4,8 +4,9 @@
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {useRouter} from "next/navigation";
-import {useForm} from "react-hook-form";
+import { useForm } from '@tanstack/react-form';
 import {useMutation} from "@tanstack/react-query";
+import {zodValidator,type zodValidator } from "@tanstack/zod-form-adapter";
 
 type LoginResponse = {
     isAuthenticated: boolean;
@@ -43,41 +44,54 @@ async function loginUser(credentials: LoginForm): Promise<LoginResponse> {
 }
 
 export function useLogin() {
+
     const router = useRouter();
 
-    const form = useForm({
-        resolver: zodResolver(loginSchema),
+    const form = useForm<LoginForm, typeof zodValidator>({
         defaultValues: {
             email: '',
             password: '',
         },
+        validatorAdapter: zodValidator(),
+        validators: {
+            onChange: loginSchema,
+               },
+        onSubmit:  async ({ value }) => {
+                     try {
+                         const response = await loginUser(value);
+                         if ('isAuthenticated' in response && response.isAuthenticated) {
+                             router.push('/');
+                         }
+                    }catch (err:any) {
+                         throw new Error(err.message || 'Ошибка входа');
+                     }
+
+                    // Пример: await loginUser(value);
+                     // await new Promise(r => setTimeout(r, 1500)); // симуляция
+                     // throw new Error('Test server error'); // для теста ошибки
+                 },
+
     });
 
 
-    const mutation = useMutation({
+    const mutation= useMutation({
         mutationFn: loginUser,
         onSuccess: (response) => {
             if ('isAuthenticated' in response && response.isAuthenticated) {
-                // Можно добавить toast или alert «Успешный вход»
-                // Обновляем все запросы, зависящие от авторизации
-                // router.refresh(); // если используете server components + revalidation
-                router.push('/dashboard'); // или куда вам нужно после логина
+
+                router.push('/'); // или куда вам нужно после логина
             }
         },
-        onError: (error: Error) => {
-            form.setError('root', { message: error.message });
-        },
 
-        return {
-            form,
-            isLoading: mutation.isPending,
-            error: form.formState.errors.root?.message,
-            login: mutation.mutate,
-            isSuccess: mutation.isSuccess,
-        };
     });
 
-
+    return {
+        form,
+        isLoading: form.state.isSubmitting,
+        error: form.state.errors?.[0] || null,
+        login: mutation.mutate,
+        isSuccess: false,
+    };
 
 
 }
