@@ -25,15 +25,12 @@ import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import {useLogin} from "@/lib/hooks/useLogin";
 
-const loginSchema = z.object({
-    email: z.string().email('Некорректный email'),
-    password: z.string().min(1, 'Пароль обязателен'),
-});
+
 
 
 
 export function LoginForm() {
-    const { form,  isLoading, error: serverError } = useLogin();
+    const { form,  isLoading, error: serverError,loginSchema } = useLogin();
 
 
 

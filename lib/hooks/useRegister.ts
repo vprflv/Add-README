@@ -3,7 +3,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import {ListKeysQueries} from "@/shared/keys";
-import {POST} from "@/app/api/route";
 
 type RegisterInput = {
     email: string;
@@ -88,7 +87,7 @@ export function useRegister() {
         onSuccess: (newUser) => {
             // Например:
             queryClient.setQueryData(["currentUser"], newUser);
-            router.push("/users");
+            router.push("/");
         },
     });
 

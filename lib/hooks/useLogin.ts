@@ -90,6 +90,7 @@ export function useLogin() {
         error: form.state.errors?.[0] || null,
         login: mutation.mutate,
         isSuccess: false,
+        loginSchema
     };
 
 
