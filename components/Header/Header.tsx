@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import {getCurrentUser} from "@/lib/supabase/server";
+import {UserDropdown} from "@/components/Header/UserDropdown";
 
 export default async function  Header() {
     const user = await getCurrentUser();
@@ -19,16 +20,7 @@ export default async function  Header() {
                     {/* Правая часть — авторизация */}
                     <div className="flex items-center gap-4">
                         {user ? (
-                            <div className="flex items-center gap-4">
-                                <Link
-                                    href="/profile"
-                                    className="text-gray-700 hover:text-indigo-600 font-medium"
-                                >
-                                    {user.name || user.email}
-                                </Link>
-
-                                {/*<LogoutButton />*/}
-                            </div>
+                           <UserDropdown user={user}/>
                         ) : (
                             <>
                                 <Link href="/login" className="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium">
@@ -43,18 +35,6 @@ export default async function  Header() {
                             </>
                         )}
 
-                        <a
-                            href="/login"
-                            className="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition"
-                        >
-                            Войти
-                        </a>
-                        <a
-                            href="/register"
-                            className="bg-indigo-600 text-white hover:bg-indigo-700 px-5 py-2.5 text-sm font-medium rounded-lg transition shadow-sm"
-                        >
-                            Регистрация
-                        </a>
                     </div>
                 </div>
             </div>
