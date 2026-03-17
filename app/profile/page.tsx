@@ -1,6 +1,9 @@
+import {ProfilePage} from "@/components/profile/ProfilePage";
+import {getCurrentUser} from "@/lib/supabase/server";
 
-export default function Profile(){
+export default async function Profile(){
+    const user = await getCurrentUser();
     return (<div>
-        profile Users Page
+        <ProfilePage currentUser={user} />
     </div>)
 }

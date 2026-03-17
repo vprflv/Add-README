@@ -5,6 +5,7 @@ import {useState} from "react";
 import Link from "next/link";
 import {SupabaseUser} from "@/supabase";
 import {useLogout} from "@/lib/hooks/useLogout";
+import {ProfilePage} from "@/components/profile/ProfilePage";
 
 
 
