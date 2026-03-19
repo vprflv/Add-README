@@ -25,7 +25,7 @@ export async function GET(request: Request) {
 
     const { data: profiles, error } = await supabaseAdmin
         .from('profiles')
-        .select('id, email, name, created_at')
+        .select('id, email, name, created_at, vehicles',)
         .order('created_at', { ascending: false });
 
     if (error) {
@@ -37,7 +37,8 @@ export async function GET(request: Request) {
         id: p.id,
         email: p.email,
         name: p.name,
-        createdAt: p.created_at,
+        created_at: p.created_at,
+        vehicles: p.vehicles ?? null,
     })) ?? [];
 
     return NextResponse.json(safeUsers);
