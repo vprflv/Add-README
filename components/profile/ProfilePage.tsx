@@ -2,10 +2,7 @@
 
 import {SupabaseUser} from "@/supabase";
 import Link from 'next/link';
-import {useQuery} from "@tanstack/react-query";
-import {ListKeysQueries} from "@/shared/keys";
-import {createSupabaseServerClient, getCurrentUser} from "@/lib/supabase/server";
-import {allowedDisplayValues} from "next/dist/compiled/@next/font/dist/constants";
+
 
 
 export function ProfilePage({ currentUser }: { currentUser: SupabaseUser }) {
