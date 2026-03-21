@@ -5,6 +5,6 @@ export default async function Profile(){
     const user = await getCurrentUser();
 
     return (<div>
-        <ProfilePage currentUser={user} />
+        <ProfilePage/>
     </div>)
 }

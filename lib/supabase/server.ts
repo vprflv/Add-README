@@ -1,20 +1,9 @@
-import {createServerClient} from "@supabase/ssr";
+import {createServerClient} from '@supabase/ssr'
 import {cookies} from "next/headers";
 import {Database} from "@/types/database.types";
 import {SafeUser} from "@/shared/types";
-type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
-export type AppUser = {
-    id: string;
-    email: string ;
-    name: string | null;
-    // avatar_url: string | null;
-    created_at: string | null;
-    // updated_at: string | null;
-    vehicles?: Profile["vehicles"] | null         // или лучше определить интерфейс для vehicle
-    // + можно добавить поля из auth.users, если нужно
-    // email_confirmed_at?: string | null;
-};
+type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
 
 export async function createSupabaseServerClient() {
@@ -54,7 +43,7 @@ export async function createSupabaseServerClient() {
 export async function getCurrentUser(): Promise<SafeUser | null> {
     const supabase = await createSupabaseServerClient();
 
-    // Самый надёжный и рекомендуемый способ на сервере
+
     const {data: {user}, error} = await supabase.auth.getUser();
 
     if (error) {
@@ -72,7 +61,7 @@ export async function getCurrentUser(): Promise<SafeUser | null> {
         .eq("id", user.id)
         .single();
 
-    // const safeProfile = profile as Profile | null;
+
 
     if (profileError || !profile) {
         console.error("profile fetch error:", profileError);

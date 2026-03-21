@@ -1,54 +1,52 @@
-'use client';
-
-import {SafeUser, Vehicle} from "@/shared/types";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
+import {SafeUser, Vehicle} from "@/shared/types";
 import {ListKeysQueries} from "@/shared/keys";
-
-const addVehicleFn = async (vehicleData: Omit<Vehicle, 'id'>) => {
-    const res = await fetch('/api/addVehicle', {
-        method: 'PATCH',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(vehicleData),
-    });
-
-    if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.error || 'Ошибка добавления');
-    }
-    return res.json();
-};
+import {useRouter} from "next/navigation";
 
 export function useAddVehicle() {
-    const queryClient = useQueryClient();
+    const router = useRouter();
+    const queryClient = useQueryClient()
 
     return useMutation({
-        mutationFn: addVehicleFn,
+        mutationFn: async (vehicleData: Omit<Vehicle, 'id'>) => {
+            const res = await fetch('/api/addVehicle', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(vehicleData),
+            })
+            if (!res.ok) throw new Error(await res.text())
+            return res.json()
+        },
+
+        onSuccess: () => {
+            router.push("/profile");
+        },
 
         onMutate: async (newVehicle) => {
-            await queryClient.cancelQueries({ queryKey: ListKeysQueries.profilKey });
-            const previousProfile = queryClient.getQueryData<SafeUser>(ListKeysQueries.profilKey);
-            if (previousProfile) {
+            await queryClient.cancelQueries({ queryKey: ListKeysQueries.profilKey })
+            const previous = queryClient.getQueryData<SafeUser>(ListKeysQueries.profilKey)
+
+            if (previous) {
+                const optimisticVehicle = { ...newVehicle, id: `optimistic-${Date.now()}` } as Vehicle
                 queryClient.setQueryData<SafeUser>(ListKeysQueries.profilKey, {
-                    ...previousProfile,
-                    vehicles: [...(previousProfile.vehicles ?? []), newVehicle as Vehicle],
-                });
+                    ...previous,
+                    vehicles: [...(previous.vehicles ?? []), optimisticVehicle],
+                })
             }
-            return { previousProfile };
+            return { previous }
+
         },
-        onError: (err, newVehicle, context) => {
-            if (context?.previousProfile) {
-                queryClient.setQueryData(ListKeysQueries.profilKey, context.previousProfile);
+
+        onError: (_, __, context) => {
+            if (context?.previous) {
+                queryClient.setQueryData(ListKeysQueries.profilKey, context.previous)
             }
-            console.error('Ошибка добавления автомобиля:', err);
         },
 
         onSettled: () => {
-            // Финальная синхронизация с сервером
-            queryClient.invalidateQueries({ queryKey:ListKeysQueries.profilKey });
+
+            queryClient.invalidateQueries({ queryKey: ListKeysQueries.profilKey })
         },
 
     })
 }
-
-
-
