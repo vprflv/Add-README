@@ -1,18 +1,33 @@
 import {Json} from "@/types/database.types";
 
-export type User = {
-    id: number;
-    email: string;
-    password: string;
-    name?: string | null;
-    createdAt: string | null;
-};
+// export type User = {
+//     id: number;
+//     email: string;
+//     password: string;
+//     name?: string | null;
+//     createdAt: string | null;
+// };
 
 export interface Vehicle {
     name: string;
     vin: string;
     year: number;
     color: string;
+}
+
+interface applicate{
+    name: string,
+    vin: string,
+}
+
+
+export type Products = {
+    id:string
+    name: string
+    photo:string
+    OEM:string
+    price:number
+    applicability:applicate[]
 }
 
 export type SafeUser = {

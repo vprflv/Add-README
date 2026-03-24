@@ -38,57 +38,25 @@ export function useRegister() {
     const router = useRouter();
     const queryClient = useQueryClient();
 
-    return useMutation <User, Error, RegisterInput, { previousUsers?: User[] }>({
+    return useMutation <User, Error, RegisterInput>({
         mutationFn: registerUser,
 
-        onMutate: async (newUserData) => {
-            await queryClient.cancelQueries({ queryKey:ListKeysQueries.usersKeyAll });
-
-            const previousUsers = queryClient.getQueryData<User[]>(ListKeysQueries.usersKeyAll);
-
-            const optimisticUser: User = {
-                id: Date.now(), // или другой временный id
-                email: newUserData.email,
-                name: newUserData.name || null,
-                createdAt: new Date().toISOString(),
-            };
-
-            queryClient.setQueryData<User[]>(ListKeysQueries.usersKeyAll, (old = []) => [
-                ...old,
-                optimisticUser,
-            ]);
-
-            return { previousUsers };
-
-
-        },
-
-        onError: (err, newUserData, context) => {
-            if (context?.previousUsers) {
-                queryClient.setQueryData(ListKeysQueries.usersKeyAll , context.previousUsers);
-            }
-        },
-
-        onSettled: (newUserFromServer, error, variables, context) => {
-            // Лучше всего — инвалидировать и перезагрузить список
-            queryClient.invalidateQueries({ queryKey: ListKeysQueries.usersKeyAll });
-
-            // Альтернатива: если сервер вернул пользователя с настоящим id → обновляем точечно
-            if (newUserFromServer && !error) {
-                queryClient.setQueryData<User[]>(ListKeysQueries.usersKeyAll, (old = []) =>
-                    old.map((u) =>
-                        // Заменяем временный id на настоящий (если сравниваете по email)
-                        u.email === newUserFromServer.email ? newUserFromServer : u
-                    )
-                );
-            }
-        },
-
         onSuccess: (newUser) => {
-            // Например:
-            queryClient.setQueryData(["currentUser"], newUser);
+            queryClient.setQueryData(ListKeysQueries.profilKey, newUser);
+
+            queryClient.invalidateQueries({
+                queryKey: ListKeysQueries.usersKeyAll
+            });
+
             router.push("/");
+
         },
+
+        onError: (err) => {
+            console.error("Ошибка регистрации:", err.message);
+        },
+
+
     });
 
     }
