@@ -1,1 +1,13 @@
+/* app/globals.css */
+
 @import "tailwindcss";
+
+/* Базовые стили проекта (можно добавить свои) */
+@theme {
+    --radius-2xl: 20px;
+    --radius-3xl: 24px;
+}
+
+body {
+    font-feature-settings: "rlig" 1, "calt" 1;
+}

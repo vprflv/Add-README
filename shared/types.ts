@@ -38,3 +38,10 @@ export type SafeUser = {
     vehicles?: Vehicle[] | null;
 
 };
+
+export type SearchResult = {
+    id: number;
+    title: string;        // будем использовать product.name как title
+    name?: string;        // для удобства
+};
+

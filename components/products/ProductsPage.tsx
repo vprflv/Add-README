@@ -78,7 +78,7 @@ export function ProductsPage() {
                                     </h3>
 
                                     <div className="mt-3 space-y-2 text-sm text-gray-600">
-                                        {product.OEM && <p>OEM: <span className="font-medium text-gray-700">{product.OEM}</span></p>}
+                                        {product.oem && <p>OEM: <span className="font-medium text-gray-700">{product.oem}</span></p>}
                                         {product.applicability && (
                                             <p>Применяемость: <span className="font-medium text-gray-700">
                                                 {Array.isArray(product.applicability) ? product.applicability.join(', ') : product.applicability}

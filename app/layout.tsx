@@ -1,5 +1,7 @@
-import type { Metadata } from "next";
 import "./globals.css";
+
+import type { Metadata } from "next";
+
 import Providers from "@/app/providers/providers";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
