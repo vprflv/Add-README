@@ -7,15 +7,11 @@ export async function fetchSearchResults(query: string): Promise<SearchResult[]>
     if (!query.trim()) return [];
 
     const supabase = createSupabaseBrowserClient();
-
+    const searchTerm = `%${query}%`;
     const { data, error } = await supabase
         .from('products')
-        .select('id, name')
-        .textSearch('name', query, {
-            type: 'websearch',      // удобный режим поиска (поддерживает "слово1 слово2")
-            config: 'russian',      // если у тебя русские названия товаров — очень важно!
-        })
-        .or(`name.ilike.%${query}%,oem.ilike.%${query}%`)
+        .select('id, name, oem', )
+        .or(`name.ilike.%${searchTerm}%,oem.ilike.%${searchTerm}%`)
         .limit(10)                // ограничиваем подсказки
         .order('name');           // сортируем по алфавиту
 
@@ -25,11 +21,19 @@ export async function fetchSearchResults(query: string): Promise<SearchResult[]>
     }
 
     // Преобразуем в нужный формат
-    return (data || []).map((product) => ({
-        id: product.id,
-        title: product.name || '',
-        name: product.name,
-    }));
+    return (data || []).map((product) =>{
+        const lowerQuery = query.toLowerCase();
+        const matchField =
+            product.name?.toLowerCase().includes(lowerQuery) ? 'name' : 'oem';
+
+        return {
+            id: product.id,
+            title: product.name || '',
+            name: product.name,
+            oem: product.oem,
+            matchField
+        };
+    });
 }
 
 export async function fetchFilteredProducts(query: string): Promise<Products[]> {

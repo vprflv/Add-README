@@ -41,7 +41,9 @@ export type SafeUser = {
 
 export type SearchResult = {
     id: number;
-    title: string;        // будем использовать product.name как title
-    name?: string;        // для удобства
+    title: string;        // будем использовать product.name как title для удобства
+    name?: string;
+    oem: string | null;
+    matchField: 'name' | 'oem';
 };
 
